@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benvenuto</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .hidden {
+            display: none;
+        }
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            z-index: 1000;
+        }
+        .cookie-banner button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        #qrcode {
+            margin: 20px auto;
+            padding: 10px;
+            background: #fff;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #error {
+            color: #ff4d4d;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+    <!-- Libreria QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+    <!-- Cookie Banner -->
+    <div id="cookieBanner" class="cookie-banner">
+        <p>Questo sito utilizza i cookie per migliorare l'esperienza dell'utente. Accetta i cookie per continuare.</p>
+        <button onclick="acceptCookies()">Accetta Cookie</button>
+    </div>
+
+    <!-- Benvenuto Container -->
+    <div id="welcomeContainer" class="container hidden">
+        <h1>Benvenuto!</h1>
+        <p>Scansiona il codice QR per accedere:</p>
+        <div id="qrcode"></div>
+        <p>Oppure inserisci il codice manualmente:</p>
+        <input type="text" id="codeInput" placeholder="Inserisci il codice">
+        <button onclick="checkCode()">Invia</button>
+        <p id="error">Codice errato. Riprova.</p>
+    </div>
+
+    <!-- Pagina Principale (visibile solo dopo il superamento della verifica) -->
+    <div id="mainContent" class="container hidden">
+        <h1>Benvenuto nella Pagina Principale!</h1>
+        <p>Hai superato con successo la verifica.</p>
+    </div>
+
+    <script>
+        let generatedCode;
+
+        // Funzione per accettare i cookie
+        function acceptCookies() {
+            document.getElementById('cookieBanner').style.display = 'none';
+            document.getElementById('welcomeContainer').classList.remove('hidden');
+            generateQRCode();
+        }
+
+        // Funzione per generare un codice casuale e il relativo QR Code
+        function generateQRCode() {
+            // Genera un codice casuale di 6 caratteri
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            generatedCode = '';
+            for (let i = 0; i < 6; i++) {
+                generatedCode += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+
+            // Genera il QR Code
+            const qrcodeContainer = document.getElementById('qrcode');
+            qrcodeContainer.innerHTML = ''; // Pulisce il contenuto precedente
+            new QRCode(qrcodeContainer, {
+                text: generatedCode,
+                width: 150,
+                height: 150,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        // Funzione per verificare il codice inserito
+        function checkCode() {
+            const userCode = document.getElementById('codeInput').value.trim().toUpperCase();
+            if (userCode === generatedCode) {
+                document.getElementById('welcomeContainer').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Genera un nuovo codice QR ad ogni refresh
+        window.onload = function() {
+            if (document.getElementById('welcomeContainer').classList.contains('hidden') === false) {
+                generateQRCode();
+            }
+        };
+    </script>
+</body>
+</html>
